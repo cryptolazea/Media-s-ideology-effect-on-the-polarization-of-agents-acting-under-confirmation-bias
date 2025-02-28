@@ -180,7 +180,7 @@ def run_single_simulation_under_Hotelling(media_beliefs, confirmation_bias, iter
     network = SocialNetwork(medias=len(media_beliefs), medias_beliefs=media_beliefs, confirmation_bias=confirmation_bias)
     network.initialize_network()
     network.expand_network()
-    network.add_medias()
+    network.add_medias_under_Hotelling()
     network.normalize_matrix()
     network.create_communication_matrix()
     network.run_belief_updates(iterations)
