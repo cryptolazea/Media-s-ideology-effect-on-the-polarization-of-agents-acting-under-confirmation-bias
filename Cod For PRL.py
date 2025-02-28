@@ -234,6 +234,32 @@ def run_simulation_and_test_under_Hotelling(media_beliefs, confirmation_bias, th
         #network.plot_polarization()  # Optional: to visualize polarization at each step
 
     return percentages
+def run_simulation_and_test_fixed_network(media_beliefs, confirmation_bias, threshold, iterations_list, network):
+    network = network
+    
+
+    percentages = []
+    for iterations in iterations_list:
+        network_copy=network
+        network_copy.run_belief_updates(iterations)
+        percentage = network_copy.percentage_higher_than_threshold(threshold)
+        percentages.append(percentage)
+        #network.plot_polarization()  # Optional: to visualize polarization at each step
+
+    return percentages
+def run_simulation_and_test_under_Hotelling_fixed_network(media_beliefs, confirmation_bias, threshold, iterations_list, network):
+    network = network
+    
+
+    percentages = []
+    for iterations in iterations_list:
+        network_copy=network
+        network_copy.run_belief_updates(iterations)
+        percentage = network_copy.percentage_higher_than_threshold(threshold)
+        percentages.append(percentage)
+        #network.plot_polarization()  # Optional: to visualize polarization at each step
+
+    return percentages
 def best_response_function_miu_b(confirmation_bias, miu_a):
     confirmation_bias = confirmation_bias
     miu_a=miu_a
@@ -243,6 +269,13 @@ def best_response_function_miu_b(confirmation_bias, miu_a):
     num_runs = 50  # Number of runs to average over
     max_average_percentage = -1
     best_miu_b = None
+    network = SocialNetwork(medias=len(media_beliefs), medias_beliefs=media_beliefs,
+                            confirmation_bias=confirmation_bias)
+    network.initialize_network()
+    network.expand_network()
+    network.add_medias_under_Hotelling()
+    network.normalize_matrix()
+    network.create_communication_matrix()
     for miu_b in np.arange(0, 1 + steps, steps):
         media_beliefs = np.array([miu_a, miu_b])
         all_percentages = []
@@ -263,6 +296,80 @@ def best_response_function_miu_b(confirmation_bias, miu_a):
     print(
         f"For miu_a = {miu_a:.2f}, the best miu_b is {best_miu_b:.2f} with an average percentage of {max_average_percentage:.2f}%")
     return best_miu_b
+def best_response_function_miu_b_fixed_network(confirmation_bias, miu_a):
+    confirmation_bias = confirmation_bias
+    miu_a=miu_a
+    threshold = 0.5
+    iterations_list = [5]
+    steps = 0.05
+    num_runs = 50  # Number of runs to average over
+    max_average_percentage = -1
+    best_miu_b = None
+    
+
+    for miu_b in np.arange(0, 1 + steps, steps):
+        media_beliefs = np.array([miu_a, miu_b])
+        all_percentages = []
+        network = SocialNetwork(medias=len(media_beliefs), medias_beliefs=media_beliefs,
+                            confirmation_bias=confirmation_bias)
+        network.initialize_network()
+        network.expand_network()
+        network.add_medias_under_Hotelling()
+        network.normalize_matrix()
+        network.create_communication_matrix()
+
+        for _ in range(num_runs):
+            percentages = run_simulation_and_test_fixed_network(media_beliefs, confirmation_bias, threshold, iterations_list, network)
+            all_percentages.append(percentages)
+
+        array = np.array(all_percentages)
+        average_percentages = np.mean(array, axis=0)
+        average_of_all_iterations = np.mean(average_percentages)
+
+        if average_of_all_iterations > max_average_percentage:
+            max_average_percentage = average_of_all_iterations
+            best_miu_b = miu_b
+
+
+    print(
+        f"For miu_a = {miu_a:.2f}, the best miu_b is {best_miu_b:.2f} with an average percentage of {max_average_percentage:.2f}%")
+    return best_miu_b
+def best_response_function_miu_b_under_Hotelling_fixed_network(confirmation_bias, miu_a):
+    confirmation_bias = confirmation_bias
+    miu_a=miu_a
+    threshold = 0.5
+    iterations_list = [5]
+    steps = 0.05
+    num_runs = 50  # Number of runs to average over
+    max_average_percentage = -1
+    best_miu_b = None
+    for miu_b in np.arange(0, 1 + steps, steps):
+        media_beliefs = np.array([miu_a, miu_b])
+        all_percentages = []
+        network = SocialNetwork(medias=len(media_beliefs), medias_beliefs=media_beliefs,
+                            confirmation_bias=confirmation_bias)
+        network.initialize_network()
+        network.expand_network()
+        network.add_medias_under_Hotelling()
+        network.normalize_matrix()
+        network.create_communication_matrix()
+
+        for _ in range(num_runs):
+            percentages = run_simulation_and_test_under_Hotelling_fixed_network(media_beliefs, confirmation_bias, threshold, iterations_list, network)
+            all_percentages.append(percentages)
+
+        array = np.array(all_percentages)
+        average_percentages = np.mean(array, axis=0)
+        average_of_all_iterations = np.mean(average_percentages)
+
+        if average_of_all_iterations > max_average_percentage:
+            max_average_percentage = average_of_all_iterations
+            best_miu_b = miu_b
+
+
+    print(
+        f"For miu_a = {miu_a:.2f}, the best miu_b is {best_miu_b:.2f} with an average percentage of {max_average_percentage:.2f}%, under Hotelling")
+    return best_miu_b
 def best_response_function_miu_b_under_Hotelling(confirmation_bias, miu_a):
     confirmation_bias = confirmation_bias
     miu_a=miu_a
@@ -274,6 +381,7 @@ def best_response_function_miu_b_under_Hotelling(confirmation_bias, miu_a):
     best_miu_b = None
     for miu_b in np.arange(0, 1 + steps, steps):
         media_beliefs = np.array([miu_a, miu_b])
+
         all_percentages = []
 
         for _ in range(num_runs):
@@ -336,6 +444,50 @@ def best_response_function_plot(confirmation_bias) :
     plt.ylabel('Best miu_b')
     plt.grid(True)
     plt.show()
+def best_response_function_plot_fixed_network(confirmation_bias) :
+    confirmation_bias = confirmation_bias
+    threshold = 0.5
+    iterations_list = [5]
+    steps = 0.05
+    num_runs = 50  # Number of runs to average over
+
+
+    miu_a_values = np.arange(0, 0.5 + steps, steps)
+    best_miu_b_for_miu_a = {}
+
+    for miu_a in miu_a_values:
+        max_average_percentage = -1
+        best_miu_b = None
+
+        for miu_b in np.arange(0, 1 + steps, steps):
+            media_beliefs = np.array([miu_a, miu_b])
+            all_percentages = []
+
+            for _ in range(num_runs):
+                percentages = run_simulation_and_test_fixed_network(media_beliefs, confirmation_bias, threshold, iterations_list)
+                all_percentages.append(percentages)
+
+            array = np.array(all_percentages)
+            average_percentages = np.mean(array, axis=0)
+            average_of_all_iterations = np.mean(average_percentages)
+
+            if average_of_all_iterations > max_average_percentage:
+                max_average_percentage = average_of_all_iterations
+                best_miu_b = miu_b
+
+        best_miu_b_for_miu_a[miu_a] = best_miu_b
+        print(
+            f"For miu_a = {miu_a:.2f}, the best miu_b is {best_miu_b:.2f} with an average percentage of {max_average_percentage:.2f}%")
+    miu_a_values = list(best_miu_b_for_miu_a.keys())
+    best_miu_b_values = list(best_miu_b_for_miu_a.values())
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(miu_a_values, best_miu_b_values, marker='o', linestyle='-')
+    plt.title('Best miu_b for each miu_a')
+    plt.xlabel('miu_a')
+    plt.ylabel('Best miu_b')
+    plt.grid(True)
+    plt.show()
 def best_response_function_plot_under_Hotteling(confirmation_bias) :
     confirmation_bias = confirmation_bias
     threshold = 0.5
@@ -356,6 +508,49 @@ def best_response_function_plot_under_Hotteling(confirmation_bias) :
 
             for _ in range(num_runs):
                 percentages = run_simulation_and_test_under_Hotelling(media_beliefs, confirmation_bias, threshold, iterations_list)
+                all_percentages.append(percentages)
+
+            array = np.array(all_percentages)
+            average_percentages = np.mean(array, axis=0)
+            average_of_all_iterations = np.mean(average_percentages)
+
+            if average_of_all_iterations > max_average_percentage:
+                max_average_percentage = average_of_all_iterations
+                best_miu_b = miu_b
+
+        best_miu_b_for_miu_a[miu_a] = best_miu_b
+        print(
+            f"For miu_a = {miu_a:.2f}, the best miu_b is {best_miu_b:.2f} with an average percentage of {max_average_percentage:.2f}%")
+    miu_a_values = list(best_miu_b_for_miu_a.keys())
+    best_miu_b_values = list(best_miu_b_for_miu_a.values())
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(miu_a_values, best_miu_b_values, marker='o', linestyle='-')
+    plt.title('Best miu_b for each miu_a')
+    plt.xlabel('miu_a')
+    plt.ylabel('Best miu_b')
+    plt.grid(True)
+    plt.show()
+def best_response_function_plot_under_Hotteling_fixed_network(confirmation_bias) :
+    confirmation_bias = confirmation_bias
+    threshold = 0.5
+    iterations_list = [5]
+    steps = 0.05
+    num_runs = 50  # Number of runs to average over
+
+    miu_a_values = np.arange(0, 0.5 + steps, steps)
+    best_miu_b_for_miu_a = {}
+
+    for miu_a in miu_a_values:
+        max_average_percentage = -1
+        best_miu_b = None
+
+        for miu_b in np.arange(0, 1 + steps, steps):
+            media_beliefs = np.array([miu_a, miu_b])
+            all_percentages = []
+
+            for _ in range(num_runs):
+                percentages = run_simulation_and_test_under_Hotelling_fixed_network(media_beliefs, confirmation_bias, threshold, iterations_list)
                 all_percentages.append(percentages)
 
             array = np.array(all_percentages)
@@ -461,19 +656,19 @@ def main():
     # plt.show()
 
 
-    media_beliefs = np.array([0.4, 0.7])
+    # media_beliefs = np.array([0.4, 0.7])
 
-    network = SocialNetwork(medias=2, medias_beliefs=media_beliefs, confirmation_bias=0.4)
+    # network = SocialNetwork(medias=2, medias_beliefs=media_beliefs, confirmation_bias=0.4)
 
-    network.initialize_network()
-    network.expand_network()
-    network.add_medias()
-    network.normalize_matrix()
-    network.create_communication_matrix()
-    plot_degree_ccdf(network.adj_matrix)
-    network.run_simulation_with_belief_plot(10)
-    network.run_belief_updates(100)
-    network.plot_polarization()
+    # network.initialize_network()
+    # network.expand_network()
+    # network.add_medias()
+    # network.normalize_matrix()
+    # network.create_communication_matrix()
+    # plot_degree_ccdf(network.adj_matrix)
+    # network.run_simulation_with_belief_plot(10)
+    # network.run_belief_updates(100)
+    # network.plot_polarization()
 
 
     # print(network.average_listening_count())
@@ -492,11 +687,11 @@ def main():
     miu_a_values = [0.1, 0.25, 0.4]
     num_runs = 50
     for miu_a in miu_a_values:
-        best_response_function_miu_b(confirmation_bias, miu_a)
+        best_response_function_miu_b_fixed_network(confirmation_bias, miu_a)
     plt.figure(figsize=(12, 8))
 
     for miu_a in miu_a_values:
-        miu_b = best_response_function_miu_b(confirmation_bias=confirmation_bias, miu_a=miu_a)
+        miu_b = best_response_function_miu_b_fixed_network(confirmation_bias=confirmation_bias, miu_a=miu_a)
         media_beliefs = np.array([miu_a, miu_b])
 
         # For add_medias method
@@ -507,7 +702,7 @@ def main():
         plt.plot(polarization_history_add_medias, label=f'miu_a={miu_a}, add_medias')
 
     for miu_a in miu_a_values:
-        miu_b = best_response_function_miu_b_under_Hotelling(confirmation_bias=confirmation_bias, miu_a=miu_a)
+        miu_b = best_response_function_miu_b_under_Hotelling_fixed_network(confirmation_bias=confirmation_bias, miu_a=miu_a)
         media_beliefs = np.array([miu_a, miu_b])
 
         # For add_medias_under_Hotelling method
