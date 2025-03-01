@@ -291,7 +291,7 @@ def best_response_function_plot(confirmation_bias) :
     threshold = 0.5
     iterations_list = [5]
     steps = 0.05
-    num_runs = 1  # Number of runs to average over
+    num_runs = 50  # Number of runs to average over
     
 
     miu_a_values = np.arange(0, 0.5 + steps, steps)
@@ -337,7 +337,7 @@ def best_response_function_plot_fixed_network(confirmation_bias) :
     threshold = 0.5
     iterations_list = [5]
     steps = 0.05
-    num_runs = 1  # Number of runs to average over
+    num_runs = 50  # Number of runs to average over
 
 
     miu_a_values = np.arange(0, 0.5 + steps, steps)
@@ -445,73 +445,73 @@ def run_simulations_and_plot_average_beliefs(media_beliefs, confirmation_bias, a
     plt.legend()
     plt.show()
 def main():
-    media_beliefs_set1 = np.array([0.7, 0.8, 0.9])
-    media_beliefs_set2 = np.array([0.5, 0.5, 0.5])
-    confirmation_bias = 0.75
-    num_simulations = 10
-    iterations = 10
+    # media_beliefs_set1 = np.array([0.7, 0.8, 0.9])
+    # media_beliefs_set2 = np.array([0.5, 0.5, 0.5])
+    # confirmation_bias = 0.75
+    # num_simulations = 10
+    # iterations = 10
     
-    avg_polarization_history_set1 = run_multiple_simulations(media_beliefs_set1, confirmation_bias, num_simulations,
-                                                             iterations)
-    avg_polarization_history_set2 = run_multiple_simulations(media_beliefs_set2, confirmation_bias, num_simulations,
-                                                             iterations)
+    # avg_polarization_history_set1 = run_multiple_simulations(media_beliefs_set1, confirmation_bias, num_simulations,
+    #                                                          iterations)
+    # avg_polarization_history_set2 = run_multiple_simulations(media_beliefs_set2, confirmation_bias, num_simulations,
+    #                                                          iterations)
     
-    plt.figure(figsize=(12, 6))
-    plt.plot(avg_polarization_history_set1, marker='o', linestyle='-', label='Media Beliefs Set 1')
-    plt.plot(avg_polarization_history_set2, marker='o', linestyle='-', label='Media Beliefs Set 2')
-    plt.title('Average Polarization Over Iterations (1000 Simulations)')
-    plt.xlabel('Iteration')
-    plt.ylabel('Average Polarization (Variance of Beliefs)')
-    plt.legend()
-    plt.grid(True)
-    plt.show()
+    # plt.figure(figsize=(12, 6))
+    # plt.plot(avg_polarization_history_set1, marker='o', linestyle='-', label='Media Beliefs Set 1')
+    # plt.plot(avg_polarization_history_set2, marker='o', linestyle='-', label='Media Beliefs Set 2')
+    # plt.title('Average Polarization Over Iterations (1000 Simulations)')
+    # plt.xlabel('Iteration')
+    # plt.ylabel('Average Polarization (Variance of Beliefs)')
+    # plt.legend()
+    # plt.grid(True)
+    # plt.show()
 
 
-    media_beliefs = np.array([0.4, 0.7])
+    # media_beliefs = np.array([0.4, 0.7])
 
-    network = SocialNetwork(medias=2, medias_beliefs=media_beliefs, confirmation_bias=0.4)
+    # network = SocialNetwork(medias=2, medias_beliefs=media_beliefs, confirmation_bias=0.4)
 
-    network.initialize_network()
-    network.expand_network()
-    network.add_medias()
-    network.normalize_matrix()
-    network.create_communication_matrix()
-    plot_degree_ccdf(network.adj_matrix)
-    network.run_simulation_with_belief_plot(10)
-    network.run_belief_updates(100)
-    network.plot_polarization()
+    # network.initialize_network()
+    # network.expand_network()
+    # network.add_medias()
+    # network.normalize_matrix()
+    # network.create_communication_matrix()
+    # plot_degree_ccdf(network.adj_matrix)
+    # network.run_simulation_with_belief_plot(10)
+    # network.run_belief_updates(100)
+    # network.plot_polarization()
 
 
     
     confirmation_bias = 0.3
     #best_response_function_plot(confirmation_bias)
-    #best_response_function_plot_fixed_network(confirmation_bias)
-    iterations = 50
-    miu_a_values = [0.1, 0.25, 0.4]
-    num_runs = 50
-    for miu_a in miu_a_values:
-        best_response_function_miu_b_fixed_network(confirmation_bias, miu_a)
-    plt.figure(figsize=(12, 8))
+    best_response_function_plot_fixed_network(confirmation_bias)
+    # iterations = 50
+    # miu_a_values = [0.1, 0.25, 0.4]
+    # num_runs = 50
+    # for miu_a in miu_a_values:
+    #     best_response_function_miu_b_fixed_network(confirmation_bias, miu_a)
+    # plt.figure(figsize=(12, 8))
 
-    for miu_a in miu_a_values:
-        miu_b = best_response_function_miu_b_fixed_network(confirmation_bias=confirmation_bias, miu_a=miu_a)
-        media_beliefs = np.array([miu_a, miu_b])
+    # for miu_a in miu_a_values:
+    #     miu_b = best_response_function_miu_b_fixed_network(confirmation_bias=confirmation_bias, miu_a=miu_a)
+    #     media_beliefs = np.array([miu_a, miu_b])
 
-        # For add_medias method
-        polarization_history_add_medias = run_simulation_and_collect_polarization(
-            media_beliefs, confirmation_bias, lambda network: network.add_medias(), iterations, num_runs)
+    #     # For add_medias method
+    #     polarization_history_add_medias = run_simulation_and_collect_polarization(
+    #         media_beliefs, confirmation_bias, lambda network: network.add_medias(), iterations, num_runs)
 
-        # Plot results
-        plt.plot(polarization_history_add_medias, label=f'miu_a={miu_a}, add_medias')
+    #     # Plot results
+    #     plt.plot(polarization_history_add_medias, label=f'miu_a={miu_a}, add_medias')
 
    
-    plt.title('Polarization Over Iterations')
-    plt.xlabel('Iteration')
-    plt.ylabel('Polarization (Variance of Beliefs)')
-    plt.legend()
-    plt.grid(True)
-    plt.savefig('.pdf')
-    plt.show()
+    # plt.title('Polarization Over Iterations')
+    # plt.xlabel('Iteration')
+    # plt.ylabel('Polarization (Variance of Beliefs)')
+    # plt.legend()
+    # plt.grid(True)
+    # plt.savefig('.pdf')
+    # plt.show()
     print("final")
 if __name__ == "__main__":
     main()
